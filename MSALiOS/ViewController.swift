@@ -412,6 +412,51 @@ extension ViewController {
             
         }
     }
+    
+    @objc func signOutAll(_ sender: UIButton) {
+            print("💪 signOut Multiple Accounts!!! ")
+                guard let applicationContext = self.applicationContext else { return }
+                
+                do {
+                    let accounts = try applicationContext.allAccounts()
+                    
+                    if accounts.isEmpty {
+                        print("No accounts to sign out")
+                        return
+                    }
+                    
+                    let signoutParameters = MSALSignoutParameters(webviewParameters: self.webViewParamaters!)
+                    
+                    // Set signoutFromBrowser based on your device mode
+                    signoutParameters.signoutFromBrowser = (self.currentDeviceMode == .shared)
+                    
+                    // Create a dispatch group to wait for all sign-outs to complete
+                    let group = DispatchGroup()
+                    
+                    for account in accounts {
+                        group.enter()
+                        applicationContext.signout(with: account, signoutParameters: signoutParameters) { (success, error) in
+                            defer { group.leave() }
+                            
+                            if let error = error {
+                                print("Couldn't sign out account \(account.username) with error: \(error)")
+                            } else {
+                                print("Sign out completed successfully for account: \(account.username)")
+                            }
+                        }
+                    }
+                    
+                    // Wait for all sign-outs to complete
+                    group.notify(queue: .main) {
+                        print("All accounts have been signed out")
+                        self.accessToken = ""
+                        self.updateCurrentAccount(account: nil)
+                        self.updateLogging(text: "Sign out completed for all accounts")
+                    }
+                } catch {
+                    print("Error retrieving accounts: \(error)")
+                }
+        }
 }
 
 // MARK: Shared Device Helpers
