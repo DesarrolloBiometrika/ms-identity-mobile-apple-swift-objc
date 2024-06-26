@@ -36,7 +36,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     let kClientID = "e8094855-125a-42d2-9eba-17fabc6fb361"
     let kTenantID = "bd852696-da47-4fd2-a4b2-c30568df3842"
     let kGraphEndpoint = "https://graph.microsoft.com/"
-    var kAuthority = "https://login.microsoftonline.com/common"
+    var kAuthority = "https://login.microsoftonline.com"
     let kRedirectUri = "msauth.com.microsoft.identitysample.MSALiOS://auth"
     let kScopes: [String] = ["user.read"]
     
@@ -439,9 +439,9 @@ extension ViewController {
                             defer { group.leave() }
                             
                             if let error = error {
-                                print("Couldn't sign out account \(account.username) with error: \(error)")
+                                print("Couldn't sign out account \(String(describing: account.username)) with error: \(error)")
                             } else {
-                                print("Sign out completed successfully for account: \(account.username)")
+                                print("Sign out completed successfully for account: \(String(describing: account.username))")
                             }
                         }
                     }
@@ -514,7 +514,7 @@ extension ViewController {
         signOutButton.setTitle("Sign Out", for: .normal)
         signOutButton.setTitleColor(.blue, for: .normal)
         signOutButton.setTitleColor(.gray, for: .disabled)
-        signOutButton.addTarget(self, action: #selector(signOut(_:)), for: .touchUpInside)
+        signOutButton.addTarget(self, action: #selector(signOutAll(_:)), for: .touchUpInside)
         self.view.addSubview(signOutButton)
         
         signOutButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
